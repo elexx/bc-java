@@ -1,8 +1,7 @@
 package org.bouncycastle.pqc.crypto.rainbow.util;
 
 import org.bouncycastle.crypto.Digest;
-
-import java.util.Arrays;
+import org.bouncycastle.util.Arrays;
 
 /**
  * This class is needed for the conversions while encoding and decoding, as well as for
@@ -236,7 +235,10 @@ public class RainbowUtil
         short[][][] local = new short[toCopy.length][][];
         for (int i = 0; i < toCopy.length; i++)
         {
-            local[i] = Arrays.stream(toCopy[i]).map(short[]::clone).toArray(short[][]::new);
+            for (int j = 0; j < toCopy[0].length; j++)
+            {
+                local[i][j] = Arrays.clone(toCopy[i][j]);
+            }
         }
         return local;
     }
@@ -269,7 +271,7 @@ public class RainbowUtil
             hashAlgo.update(hash, 0, digest_size);
             hash = new byte[digest_size];
             hashAlgo.doFinal(hash, 0);
-            final_hash = org.bouncycastle.util.Arrays.concatenate(final_hash, hash);
+            final_hash = Arrays.concatenate(final_hash, hash);
             left_to_hash -= digest_size;
         }
 
