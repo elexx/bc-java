@@ -8,7 +8,6 @@ import org.bouncycastle.pqc.crypto.rainbow.util.GF2Field;
 import org.bouncycastle.pqc.crypto.rainbow.util.RainbowUtil;
 
 import java.security.SecureRandom;
-import java.util.Arrays;
 
 public class RainbowKeyPairGenerator
     implements AsymmetricCipherKeyPairGenerator
@@ -146,7 +145,6 @@ public class RainbowKeyPairGenerator
     }
 
 
-
     private void calculate_F_from_Q()
     {
         // Layer 1
@@ -266,5 +264,8 @@ public class RainbowKeyPairGenerator
         this.initialize(param);
     }
 
-    public AsymmetricCipherKeyPair generateKeyPair() { return genKeyPair(); }
+    public AsymmetricCipherKeyPair generateKeyPair()
+    {
+        return genKeyPair();
+    }
 }

@@ -23,7 +23,7 @@ public class RainbowParameters
 
     public RainbowParameters(int version)
     {
-        switch(version)
+        switch (version)
         {
             case 3:
                 this.v1 = 68;

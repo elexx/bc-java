@@ -617,7 +617,7 @@ public class ComputeInField
             throw new RuntimeException("Multiplication not possible!");
         }
         short temp;
-        short [][][] ret = new short[c.length][c[0].length][c[0][0].length];
+        short[][][] ret = new short[c.length][c[0].length][c[0][0].length];
 
         for (int i = 0; i < b[0].length; i++)
         {

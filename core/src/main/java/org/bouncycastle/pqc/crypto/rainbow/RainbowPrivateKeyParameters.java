@@ -19,12 +19,12 @@ public class RainbowPrivateKeyParameters
     private final short[][][] l2_F5;
     private final short[][][] l2_F6;
 
-    public RainbowPrivateKeyParameters( RainbowParameters params,
-                                        byte[] sk_seed, short[][] s1,
-                                        short[][] t1, short[][] t3, short[][] t4,
-                                        short[][][] l1_F1, short[][][] l1_F2,
-                                        short[][][] l2_F1, short[][][] l2_F2,
-                                        short[][][] l2_F3, short[][][] l2_F5, short[][][] l2_F6)
+    public RainbowPrivateKeyParameters(RainbowParameters params,
+                                       byte[] sk_seed, short[][] s1,
+                                       short[][] t1, short[][] t3, short[][] t4,
+                                       short[][][] l1_F1, short[][][] l1_F2,
+                                       short[][][] l2_F1, short[][][] l2_F2,
+                                       short[][][] l2_F3, short[][][] l2_F5, short[][][] l2_F6)
     {
         super(true, params);
 

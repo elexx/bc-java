@@ -203,7 +203,7 @@ public class RainbowSigner
         // z = T^-1 * y
         tmp_vec = cf.multiplyMatrix(sk.getT1(), y_o1);
         z = cf.addVect(vinegar, tmp_vec);
-        tmp_vec = cf.multiplyMatrix(sk.getT4(), y_o2 );
+        tmp_vec = cf.multiplyMatrix(sk.getT4(), y_o2);
         z = cf.addVect(z, tmp_vec);
         tmp_vec = cf.multiplyMatrix(sk.getT3(), y_o2);
         tmp_vec = cf.addVect(y_o1, tmp_vec);

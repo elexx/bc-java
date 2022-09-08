@@ -36,7 +36,7 @@ public class RainbowIIITest
 
         ParametersWithRandom param = new ParametersWithRandom(pair.getPrivate(), new SecureRandom());
 
-        DigestingMessageSigner rainbowSigner = new DigestingMessageSigner(new RainbowSigner() , params.getHash_algo());
+        DigestingMessageSigner rainbowSigner = new DigestingMessageSigner(new RainbowSigner(), params.getHash_algo());
 
         rainbowSigner.init(true, param);
 
@@ -58,8 +58,7 @@ public class RainbowIIITest
          */
     }
 
-    public static void main(
-            String[]    args)
+    public static void main(String[] args)
     {
         runTest(new RainbowIIITest());
     }

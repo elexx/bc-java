@@ -2,8 +2,6 @@ package org.bouncycastle.pqc.crypto.rainbow;
 
 import org.bouncycastle.pqc.crypto.rainbow.util.RainbowUtil;
 
-import java.util.Arrays;
-
 public class RainbowPublicKeyParameters
     extends RainbowKeyParameters
 {
