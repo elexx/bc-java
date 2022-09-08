@@ -1,8 +1,7 @@
 package org.bouncycastle.pqc.crypto.rainbow;
 
 import org.bouncycastle.pqc.crypto.rainbow.util.RainbowUtil;
-
-import java.util.Arrays;
+import org.bouncycastle.util.Arrays;
 
 public class RainbowPrivateKeyParameters
     extends RainbowKeyParameters
@@ -30,10 +29,26 @@ public class RainbowPrivateKeyParameters
         super(true, params);
 
         this.sk_seed = sk_seed.clone();
-        this.s1 = Arrays.stream(s1).map(short[]::clone).toArray(short[][]::new);
-        this.t1 = Arrays.stream(t1).map(short[]::clone).toArray(short[][]::new);
-        this.t3 = Arrays.stream(t3).map(short[]::clone).toArray(short[][]::new);
-        this.t4 = Arrays.stream(t4).map(short[]::clone).toArray(short[][]::new);
+        this.s1 = new short[s1.length][];
+        for (int i = 0; i < s1.length; i++)
+        {
+            this.s1[i] = Arrays.clone(s1[i]);
+        }
+        this.t1 = new short[t1.length][];
+        for (int i = 0; i < t1.length; i++)
+        {
+            this.t1[i] = Arrays.clone(t1[i]);
+        }
+        this.t3 = new short[t3.length][];
+        for (int i = 0; i < t3.length; i++)
+        {
+            this.t3[i] = Arrays.clone(t3[i]);
+        }
+        this.t4 = new short[t4.length][];
+        for (int i = 0; i < t4.length; i++)
+        {
+            this.t4[i] = Arrays.clone(t4[i]);
+        }
         this.l1_F1 = RainbowUtil.cloneArray(l1_F1);
         this.l1_F2 = RainbowUtil.cloneArray(l1_F2);
         this.l2_F1 = RainbowUtil.cloneArray(l2_F1);
