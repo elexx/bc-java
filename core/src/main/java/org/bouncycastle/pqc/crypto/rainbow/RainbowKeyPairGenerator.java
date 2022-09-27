@@ -4,7 +4,6 @@ import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPairGenerator;
 import org.bouncycastle.crypto.KeyGenerationParameters;
 import org.bouncycastle.pqc.crypto.rainbow.util.ComputeInField;
-import org.bouncycastle.pqc.crypto.rainbow.util.GF2Field;
 import org.bouncycastle.pqc.crypto.rainbow.util.RainbowUtil;
 
 import java.security.SecureRandom;
@@ -67,23 +66,23 @@ public class RainbowKeyPairGenerator
         byte[] pk_seed = new byte[rainbowParams.getParameters().getLen_pkseed()];
         random.nextBytes(pk_seed);
 
-        SecureRandom sk_random = new SecureRandom(sk_seed);
-        this.s1 = generate_random_2d(sk_random, o1, o2);
-        this.t1 = generate_random_2d(sk_random, v1, o1);
-        this.t2 = generate_random_2d(sk_random, v1, o2);
-        this.t3 = generate_random_2d(sk_random, o1, o2);
+        SecureRandom sk_random = RainbowUtil.getSecureRandom(this.random.getAlgorithm(), sk_seed);
+        this.s1 = RainbowUtil.generate_random_2d(sk_random, o1, o2);
+        this.t1 = RainbowUtil.generate_random_2d(sk_random, v1, o1);
+        this.t2 = RainbowUtil.generate_random_2d(sk_random, v1, o2);
+        this.t3 = RainbowUtil.generate_random_2d(sk_random, o1, o2);
         // t4 = t1 * t3 - t2
         calculate_t4();
 
-        SecureRandom pk_random = new SecureRandom(pk_seed);
+        SecureRandom pk_random = RainbowUtil.getSecureRandom(this.random.getAlgorithm(), pk_seed);
         // generating l1_Q1, l1_Q2, l2_Q1, l2_Q2, l2_Q3, l2_Q5, l2_Q6
-        this.l1_Q1 = generate_random(pk_random, o1, v1, v1, true);
-        this.l1_Q2 = generate_random(pk_random, o1, v1, o1, false);
-        this.l2_Q1 = generate_random(pk_random, o2, v1, v1, true);
-        this.l2_Q2 = generate_random(pk_random, o2, v1, o1, false);
-        this.l2_Q3 = generate_random(pk_random, o2, v1, o2, false);
-        this.l2_Q5 = generate_random(pk_random, o2, o1, o1, true);
-        this.l2_Q6 = generate_random(pk_random, o2, o1, o2, false);
+        this.l1_Q1 = RainbowUtil.generate_random(pk_random, o1, v1, v1, true);
+        this.l1_Q2 = RainbowUtil.generate_random(pk_random, o1, v1, o1, false);
+        this.l2_Q1 = RainbowUtil.generate_random(pk_random, o2, v1, v1, true);
+        this.l2_Q2 = RainbowUtil.generate_random(pk_random, o2, v1, o1, false);
+        this.l2_Q3 = RainbowUtil.generate_random(pk_random, o2, v1, o2, false);
+        this.l2_Q5 = RainbowUtil.generate_random(pk_random, o2, o1, o1, true);
+        this.l2_Q6 = RainbowUtil.generate_random(pk_random, o2, o1, o2, false);
         this.l1_Q1 = cf.obfuscate_l1_polys(this.s1, this.l2_Q1, this.l1_Q1);
         this.l1_Q2 = cf.obfuscate_l1_polys(this.s1, this.l2_Q2, this.l1_Q2);
         // calculate the rest parts of secret key from Qs and S,T
@@ -103,38 +102,6 @@ public class RainbowKeyPairGenerator
                                                 pk_seed, this.l1_Q3, this.l1_Q5, this.l1_Q6, this.l1_Q9, this.l2_Q9);
 
         return new AsymmetricCipherKeyPair(pubKey, privKey);
-    }
-
-    private short[][] generate_random_2d(SecureRandom sr, int dim_row, int dim_col)
-    {
-        short[][] matrix = new short[dim_row][dim_col];
-
-        for (int i = 0; i < dim_row; i++)
-        {
-            for (int j = 0; j < dim_col; j++)
-            {
-                matrix[i][j] = (short) (sr.nextInt() & GF2Field.MASK);
-            }
-        }
-
-        return matrix;
-    }
-
-    private short[][][] generate_random(SecureRandom sr, int dim_batch, int dim_row, int dim_col, boolean triangular)
-    {
-        short[][][] matrix = new short[dim_batch][dim_row][dim_col];
-
-        for (int k = 0; k < dim_batch; k++)
-        {
-            for (int i = 0; i < dim_row; i++)
-            {
-                for (int j = (triangular ? i : 0); j < dim_col; j++)
-                {
-                    matrix[k][i][j] = (short) (sr.nextInt() & GF2Field.MASK);
-                }
-            }
-        }
-        return matrix;
     }
 
     // t4 = t1 * t3 -t2
@@ -169,9 +136,9 @@ public class RainbowKeyPairGenerator
         // F1 = Q1
         this.l2_F1 = RainbowUtil.cloneArray(this.l2_Q1);
 
-        // F2 = (Q1 + Q1_trans) * T1 + Q2
         for (int k = 0; k < this.o2; k++)
         {
+            // F2 = (Q1 + Q1_trans) * T1 + Q2
             short[][] Q1Q1_t = cf.addMatrixTranspose(this.l2_Q1[k]);
             this.l2_F2[k] = cf.multiplyMatrix(Q1Q1_t, this.t1);
             this.l2_F2[k] = cf.addMatrix(this.l2_F2[k], this.l2_Q2[k]);
@@ -182,7 +149,7 @@ public class RainbowKeyPairGenerator
             this.l2_F3[k] = cf.addMatrix(this.l2_F3[k], temp);
             this.l2_F3[k] = cf.addMatrix(this.l2_F3[k], this.l2_Q3[k]);
 
-            // F5 = UT( T1_trans * Q1 * T1 + T1_trans * Q2 + Q5)
+            // F5 = UT( T1_trans * (Q1 * T1 + Q2) + Q5)
             temp = cf.multiplyMatrix(this.l2_Q1[k], this.t1);
             temp = cf.addMatrix(temp, this.l2_Q2[k]);
             short[][] T1_trans = cf.transpose(this.t1);

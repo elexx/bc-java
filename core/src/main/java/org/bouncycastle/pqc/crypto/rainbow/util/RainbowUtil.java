@@ -3,6 +3,9 @@ package org.bouncycastle.pqc.crypto.rainbow.util;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.util.Arrays;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+
 /**
  * This class is needed for the conversions while encoding and decoding, as well as for
  * comparison between arrays of some dimensions
@@ -232,7 +235,7 @@ public class RainbowUtil
 
     public static short[][][] cloneArray(short[][][] toCopy)
     {
-        short[][][] local = new short[toCopy.length][][];
+        short[][][] local = new short[toCopy.length][toCopy[0].length][];
         for (int i = 0; i < toCopy.length; i++)
         {
             for (int j = 0; j < toCopy[0].length; j++)
@@ -287,6 +290,67 @@ public class RainbowUtil
         }
 
         return final_hash;
+    }
+
+    public static SecureRandom getSecureRandom(String algorithm, byte[] seed)
+    {
+        SecureRandom sr;
+        try
+        {
+            sr = SecureRandom.getInstance(algorithm);
+        } catch (NoSuchAlgorithmException e)
+        {
+            throw new RuntimeException(e);
+        }
+        sr.setSeed(seed);
+        return sr;
+    }
+
+    public static short[][] generate_random_2d(SecureRandom sr, int dim_row, int dim_col)
+    {
+        short[][] matrix = new short[dim_row][dim_col];
+
+        for (int i = 0; i < dim_row; i++)
+        {
+            for (int j = 0; j < dim_col; j++)
+            {
+                matrix[i][j] = (short) ((sr.nextInt() & GF2Field.MASK)%5);
+            }
+        }
+
+        return matrix;
+    }
+
+    public static short[][][] generate_random(SecureRandom sr, int dim_batch, int dim_row, int dim_col, boolean triangular)
+    {
+        short[][][] matrix = new short[dim_batch][dim_row][dim_col];
+
+        for (int k = 0; k < dim_batch; k++)
+        {
+            for (int i = 0; i < dim_row; i++)
+            {
+                for (int j = (triangular ? i : 0); j < dim_col; j++)
+                {
+                    matrix[k][i][j] = (short) ((sr.nextInt() & GF2Field.MASK)%5);
+                }
+            }
+        }
+        return matrix;
+    }
+
+    public static void printArray(String s, short[][] a)
+    {
+        System.out.println(s);
+        System.out.println(java.util.Arrays.deepToString(a));
+    }
+
+    public static void printArray(String s, short[][][] a)
+    {
+        System.out.println(s);
+        for (short[][] shorts : a)
+        {
+            printArray("", shorts);
+        }
     }
 
 }

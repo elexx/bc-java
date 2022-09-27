@@ -7,6 +7,7 @@ import org.bouncycastle.crypto.params.ParametersWithRandom;
 import org.bouncycastle.pqc.crypto.MessageSigner;
 import org.bouncycastle.pqc.crypto.rainbow.util.GF2Field;
 import org.bouncycastle.pqc.crypto.rainbow.util.ComputeInField;
+import org.bouncycastle.pqc.crypto.rainbow.util.RainbowPublicMap;
 import org.bouncycastle.pqc.crypto.rainbow.util.RainbowUtil;
 import org.bouncycastle.util.Arrays;
 
@@ -26,6 +27,7 @@ public class RainbowSigner
     private ComputeInField cf = new ComputeInField();
 
     RainbowKeyParameters key;
+    Digest hashAlgo;
 
     public void init(boolean forSigning, CipherParameters param)
     {
@@ -50,6 +52,7 @@ public class RainbowSigner
         }
 
         this.signableDocumentLength = this.key.getDocLength();
+        this.hashAlgo = this.key.getParams().getHash_algo();
     }
 
     public byte[] generateSignature(byte[] message)
@@ -61,7 +64,6 @@ public class RainbowSigner
         int n  = this.key.getParams().getN(); // o1 + o2 + v1
 
         RainbowPrivateKeyParameters sk = (RainbowPrivateKeyParameters)this.key;
-        Digest hashAlgo = sk.getParams().getHash_algo();
 
         short[] vinegar = new short[v1];
         short[][] L1 = null; // layer 1 linear equations
@@ -78,7 +80,7 @@ public class RainbowSigner
         byte[] hash;
         short[] h;
 
-        // x = S^1 * h
+        // x = S^-1 * h
         short[] x = new short[m];
 
         // y = F^-1 * x
@@ -154,7 +156,7 @@ public class RainbowSigner
             digest_salt = Arrays.concatenate(message, salt);
 
             // h = (short)H(msg_digest||salt)
-            hash = RainbowUtil.hash(hashAlgo, digest_salt, m);
+            hash = RainbowUtil.hash(this.hashAlgo, digest_salt, m);
             h = makeMessageRepresentative(hash);
 
             // x = S^-1 * h
@@ -228,7 +230,28 @@ public class RainbowSigner
 
     public boolean verifySignature(byte[] message, byte[] signature)
     {
-        return false;
+        int m  = this.key.getParams().getM(); // o1 + o2
+        int n  = this.key.getParams().getN(); // o1 + o2 + v1
+
+        RainbowPublicKeyParameters pk = (RainbowPublicKeyParameters)this.key;
+        RainbowPublicMap p_map = new RainbowPublicMap(this.key.getParams(), this.random);
+
+        // h = (short)H(msg_digest||salt)
+        byte[] salt = Arrays.copyOfRange(signature, n, signature.length);
+        byte[] digest_salt = Arrays.concatenate(message, salt);
+        byte[] hash = RainbowUtil.hash(this.hashAlgo, digest_salt, m);
+        short[] h = makeMessageRepresentative(hash);
+
+        // verificationResult = P(sigInt)
+        byte[] sig = Arrays.copyOfRange(signature, 0, n);
+        short[] sigInt = RainbowUtil.convertArray(sig);
+        short[] verificationResult = p_map.publicMap(pk, sigInt);
+
+        System.out.println("msg: " + java.util.Arrays.toString(h));
+        System.out.println("ver: " + java.util.Arrays.toString(verificationResult));
+
+        // compare
+        return RainbowUtil.equals(h, verificationResult);
     }
 
     /**

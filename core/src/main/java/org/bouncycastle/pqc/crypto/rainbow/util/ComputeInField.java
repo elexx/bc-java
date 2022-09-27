@@ -540,16 +540,7 @@ public class ComputeInField
             throw new RuntimeException("Addition is not possible!");
         }
 
-        short[][] rslt = new short[matrix.length][matrix.length];//
-        for (int i = 0; i < matrix.length; i++)
-        {
-            for (int j = 0; j < matrix[0].length; j++)
-            {
-                if (i == j) continue;
-                rslt[i][j] = GF2Field.addElem(matrix[i][j], matrix[j][i]);
-            }
-        }
-        return rslt;
+        return addMatrix(matrix, transpose(matrix));
     }
 
     /**
@@ -565,7 +556,6 @@ public class ComputeInField
         {
             for (int j = 0; j < matrix[0].length; j++)
             {
-                if (i == j) continue;
                 rslt[j][i] = matrix[i][j];
             }
         }
@@ -589,9 +579,9 @@ public class ComputeInField
         short[][] rslt = new short[matrix.length][matrix.length];//
         for (int i = 0; i < matrix.length; i++)
         {
-            for (int j = i; j < matrix[0].length; j++)
+            rslt[i][i] = matrix[i][i];
+            for (int j = i+1; j < matrix[0].length; j++)
             {
-                if (i == j) continue;
                 rslt[i][j] = GF2Field.addElem(matrix[i][j], matrix[j][i]);
             }
         }
@@ -628,8 +618,9 @@ public class ComputeInField
                     for (int k = 0; k < a[0].length; k++)
                     {
                         temp = GF2Field.multElem(a[l][k], b[k][i][j]);
-                        ret[l][i][j] = GF2Field.addElem(c[l][i][j], temp);
+                        ret[l][i][j] = GF2Field.addElem(ret[l][i][j], temp);
                     }
+                    ret[l][i][j] = GF2Field.addElem(c[l][i][j], ret[l][i][j]);
                 }
             }
         }

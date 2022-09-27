@@ -2,8 +2,6 @@ package org.bouncycastle.pqc.crypto.rainbow;
 
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 
-import java.util.Arrays;
-
 public class RainbowKeyParameters
     extends AsymmetricKeyParameter
 {

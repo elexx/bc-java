@@ -1,23 +1,22 @@
 package org.bouncycastle.pqc.crypto.test;
 
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
-import org.bouncycastle.crypto.digests.SHA224Digest;
 import org.bouncycastle.crypto.params.ParametersWithRandom;
 import org.bouncycastle.pqc.crypto.DigestingMessageSigner;
-import org.bouncycastle.pqc.crypto.rainbow.RainbowKeyGenerationParameters;
-import org.bouncycastle.pqc.crypto.rainbow.RainbowKeyPairGenerator;
-import org.bouncycastle.pqc.crypto.rainbow.RainbowParameters;
-import org.bouncycastle.pqc.crypto.rainbow.RainbowSigner;
+import org.bouncycastle.pqc.crypto.rainbow.*;
 import org.bouncycastle.util.BigIntegers;
 import org.bouncycastle.util.test.SimpleTest;
 
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.Arrays;
 
 public class RainbowIIITest
     extends SimpleTest
 {
+    static int success = 0;
+    static int fail = 0;
+
     public String getName()
     {
         return "Rainbow_III";
@@ -26,15 +25,25 @@ public class RainbowIIITest
     public void performTest()
     {
         RainbowParameters params = new RainbowParameters(3);
+        SecureRandom random;
+        try
+        {
+            random = SecureRandom.getInstance("SHA1PRNG");
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            random = new SecureRandom();
+        }
+
 
         RainbowKeyPairGenerator rainbowKeyGen = new RainbowKeyPairGenerator();
-        RainbowKeyGenerationParameters genParam = new RainbowKeyGenerationParameters(new SecureRandom(), params);
+        RainbowKeyGenerationParameters genParam = new RainbowKeyGenerationParameters(random, params);
 
         rainbowKeyGen.init(genParam);
 
         AsymmetricCipherKeyPair pair = rainbowKeyGen.generateKeyPair();
 
-        ParametersWithRandom param = new ParametersWithRandom(pair.getPrivate(), new SecureRandom());
+        ParametersWithRandom param = new ParametersWithRandom(pair.getPrivate(), random);
 
         DigestingMessageSigner rainbowSigner = new DigestingMessageSigner(new RainbowSigner(), params.getHash_algo());
 
@@ -44,22 +53,24 @@ public class RainbowIIITest
         rainbowSigner.update(message, 0, message.length);
         byte[] sig = rainbowSigner.generateSignature();
 
-        System.out.println(Arrays.toString(sig));
-
-        /*
         rainbowSigner.init(false, pair.getPublic());
         rainbowSigner.update(message, 0, message.length);
 
         if (!rainbowSigner.verifySignature(sig))
         {
+            RainbowIIITest.fail++;
             fail("verification fails");
         }
-
-         */
+        RainbowIIITest.success++;
     }
 
     public static void main(String[] args)
     {
-        runTest(new RainbowIIITest());
+        for (int i = 0; i < 100; i++)
+        {
+            runTest(new RainbowIIITest());
+        }
+        System.out.println("success: "+RainbowIIITest.success+" failure: "+RainbowIIITest.fail);
+        //runTest(new RainbowIIITest());
     }
 }
