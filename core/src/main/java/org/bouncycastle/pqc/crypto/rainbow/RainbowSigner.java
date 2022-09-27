@@ -247,8 +247,8 @@ public class RainbowSigner
         short[] sigInt = RainbowUtil.convertArray(sig);
         short[] verificationResult = p_map.publicMap(pk, sigInt);
 
-        System.out.println("msg: " + java.util.Arrays.toString(h));
-        System.out.println("ver: " + java.util.Arrays.toString(verificationResult));
+        //System.out.println("msg: " + java.util.Arrays.toString(h));
+        //System.out.println("ver: " + java.util.Arrays.toString(verificationResult));
 
         // compare
         return RainbowUtil.equals(h, verificationResult);

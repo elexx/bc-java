@@ -314,7 +314,7 @@ public class RainbowUtil
         {
             for (int j = 0; j < dim_col; j++)
             {
-                matrix[i][j] = (short) ((sr.nextInt() & GF2Field.MASK)%5);
+                matrix[i][j] = (short) ((sr.nextInt() & GF2Field.MASK));
             }
         }
 
@@ -331,13 +331,13 @@ public class RainbowUtil
             {
                 for (int j = (triangular ? i : 0); j < dim_col; j++)
                 {
-                    matrix[k][i][j] = (short) ((sr.nextInt() & GF2Field.MASK)%5);
+                    matrix[k][i][j] = (short) ((sr.nextInt() & GF2Field.MASK));
                 }
             }
         }
         return matrix;
     }
-
+/*
     public static void printArray(String s, short[][] a)
     {
         System.out.println(s);
@@ -352,5 +352,5 @@ public class RainbowUtil
             printArray("", shorts);
         }
     }
-
+*/
 }
