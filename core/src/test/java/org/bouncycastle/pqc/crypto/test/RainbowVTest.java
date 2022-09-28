@@ -14,9 +14,6 @@ import java.security.SecureRandom;
 public class RainbowVTest
     extends SimpleTest
 {
-    static int success = 0;
-    static int fail = 0;
-
     public String getName()
     {
         return "Rainbow_V";
@@ -58,19 +55,12 @@ public class RainbowVTest
 
         if (!rainbowSigner.verifySignature(sig))
         {
-            RainbowVTest.fail++;
             fail("verification fails");
         }
-        RainbowVTest.success++;
     }
 
     public static void main(String[] args)
     {
-        for (int i = 0; i < 100; i++)
-        {
-            runTest(new RainbowVTest());
-        }
-        System.out.println("success: "+RainbowVTest.success+" failure: "+RainbowVTest.fail);
-        //runTest(new RainbowVTest());
+        runTest(new RainbowVTest());
     }
 }

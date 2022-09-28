@@ -68,7 +68,7 @@ public class RainbowPublicMap
                     tmp = cf.addVect(tmp, accu[i+j]);
                 }
             }
-           ret = cf.addVect(ret, cf.multVect((short)accu_bit, tmp));
+            ret = cf.addVect(ret, cf.multVect((short)accu_bit, tmp));
         }
 
         return ret;

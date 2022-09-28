@@ -18,7 +18,6 @@ public class RainbowParameters
     private static final int len_pkseed = 32;
     private static final int len_skseed = 32;
     private static final int len_salt = 16;
-    private final int len_signature;
     private final Digest hash_algo;
 
     public RainbowParameters(int version)
@@ -45,7 +44,6 @@ public class RainbowParameters
         this.v2 = v1 + o1;
         this.n = v1 + o1 + o2;
         this.m = o1 + o2;
-        this.len_signature = n + len_salt;
     }
 
     public RainbowParameters()
@@ -102,16 +100,6 @@ public class RainbowParameters
     public int getLen_salt()
     {
         return len_salt;
-    }
-
-    public int getLen_signature()
-    {
-        return len_signature;
-    }
-
-    public int triangle_terms(int i)
-    {
-        return i * (i + 1) / 2;
     }
 
 }

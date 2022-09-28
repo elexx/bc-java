@@ -337,20 +337,5 @@ public class RainbowUtil
         }
         return matrix;
     }
-/*
-    public static void printArray(String s, short[][] a)
-    {
-        System.out.println(s);
-        System.out.println(java.util.Arrays.deepToString(a));
-    }
 
-    public static void printArray(String s, short[][][] a)
-    {
-        System.out.println(s);
-        for (short[][] shorts : a)
-        {
-            printArray("", shorts);
-        }
-    }
-*/
 }

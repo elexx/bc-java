@@ -68,12 +68,12 @@ public class RainbowSigner
         short[] vinegar = new short[v1];
         short[][] L1 = null; // layer 1 linear equations
 
-        short[][] L2 = new short[o2][o2]; // layer 2 linear equations
-        short[] r_l1_F1 = new short[o1];
-        short[] r_l2_F1 = new short[o2];
-        short[] r_l2_F5 = new short[o2];
-        short[][] L2_F2 = new short[o2][o1];
-        short[][] L2_F3 = new short[o2][o2];
+        short[][] L2; // layer 2 linear equations
+        short[] r_l1_F1;
+        short[] r_l2_F1;
+        short[] r_l2_F5;
+        short[][] L2_F2;
+        short[][] L2_F3;
 
         byte[] salt = new byte[sk.getParams().getLen_salt()];
         byte[] digest_salt;
@@ -118,6 +118,13 @@ public class RainbowSigner
 
         while (y_o2 == null && counter < MAXITS)
         {
+            L2 = new short[o2][o2];
+            r_l1_F1 = new short[o1];
+            r_l2_F1 = new short[o2];
+            r_l2_F5 = new short[o2];
+            L2_F2 = new short[o2][o1];
+            L2_F3 = new short[o2][o2];
+
             for (int k = 0; k < o1; k++)
             {
                 r_l1_F1[k] = cf.multiplyMatrix_quad(sk.getL1_F1()[k], vinegar);
@@ -219,11 +226,7 @@ public class RainbowSigner
         }
 
         // cast signature from short[] to byte[]
-        byte[] signature = new byte[n];
-        for (int i = 0; i < n; i++)
-        {
-            signature[i] = ((byte)z[i]);
-        }
+        byte[] signature = RainbowUtil.convertArray(z);
 
         return Arrays.concatenate(signature, salt);
     }
@@ -242,13 +245,10 @@ public class RainbowSigner
         byte[] hash = RainbowUtil.hash(this.hashAlgo, digest_salt, m);
         short[] h = makeMessageRepresentative(hash);
 
-        // verificationResult = P(sigInt)
-        byte[] sig = Arrays.copyOfRange(signature, 0, n);
-        short[] sigInt = RainbowUtil.convertArray(sig);
-        short[] verificationResult = p_map.publicMap(pk, sigInt);
-
-        //System.out.println("msg: " + java.util.Arrays.toString(h));
-        //System.out.println("ver: " + java.util.Arrays.toString(verificationResult));
+        // verificationResult = P(sig)
+        byte[] sig_msg = Arrays.copyOfRange(signature, 0, n);
+        short[] sig = RainbowUtil.convertArray(sig_msg);
+        short[] verificationResult = p_map.publicMap(pk, sig);
 
         // compare
         return RainbowUtil.equals(h, verificationResult);

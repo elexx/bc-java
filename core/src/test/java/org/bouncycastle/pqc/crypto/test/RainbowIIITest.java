@@ -10,13 +10,11 @@ import org.bouncycastle.util.test.SimpleTest;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Arrays;
 
 public class RainbowIIITest
     extends SimpleTest
 {
-    static int success = 0;
-    static int fail = 0;
-
     public String getName()
     {
         return "Rainbow_III";
@@ -58,19 +56,12 @@ public class RainbowIIITest
 
         if (!rainbowSigner.verifySignature(sig))
         {
-            RainbowIIITest.fail++;
             fail("verification fails");
         }
-        RainbowIIITest.success++;
     }
 
     public static void main(String[] args)
     {
-        for (int i = 0; i < 100; i++)
-        {
-            runTest(new RainbowIIITest());
-        }
-        System.out.println("success: "+RainbowIIITest.success+" failure: "+RainbowIIITest.fail);
-        //runTest(new RainbowIIITest());
+        runTest(new RainbowIIITest());
     }
 }
