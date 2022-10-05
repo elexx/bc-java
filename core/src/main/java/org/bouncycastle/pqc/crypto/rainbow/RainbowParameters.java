@@ -19,10 +19,11 @@ public class RainbowParameters
     private static final int len_skseed = 32;
     private static final int len_salt = 16;
     private final Digest hash_algo;
+    private final Version version;
 
-    public RainbowParameters(int version)
+    public RainbowParameters(int strength, Version version)
     {
-        switch (version)
+        switch (strength)
         {
             case 3:
                 this.v1 = 68;
@@ -44,12 +45,13 @@ public class RainbowParameters
         this.v2 = v1 + o1;
         this.n = v1 + o1 + o2;
         this.m = o1 + o2;
+        this.version = version;
     }
 
     public RainbowParameters()
     {
         // TODO: choose default version
-        this(3);
+        this(3, Version.CLASSIC);
     }
 
     public int getV1()
@@ -70,6 +72,11 @@ public class RainbowParameters
     public Digest getHash_algo()
     {
         return this.hash_algo;
+    }
+
+    public Version getVersion()
+    {
+        return this.version;
     }
 
     public int getV2()

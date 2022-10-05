@@ -15,10 +15,12 @@ public class RainbowTest
     extends SimpleTest
 {
     private int strength;
+    private Version version;
 
-    public RainbowTest(int strength)
+    public RainbowTest(int strength, Version version)
     {
         this.strength = strength;
+        this.version = version;
     }
 
     public String getName()
@@ -37,12 +39,28 @@ public class RainbowTest
                         "No valid strength. Please choose one of the following: 3, 5");
         }
 
+        switch (this.version)
+        {
+            case CLASSIC:
+                name += "_Classic";
+                break;
+            case CIRCUMZENITHAL:
+                name += "_Circumzenithal";
+                break;
+            case COMPRESSED:
+                name += "_Compressed";
+                break;
+            default:
+                throw new IllegalArgumentException(
+                        "No valid version. Please choose one of the following: classic, circumzenithal, compressed");
+        }
+
         return name;
     }
 
     public void performTest()
     {
-        RainbowParameters params = new RainbowParameters(strength);
+        RainbowParameters params = new RainbowParameters(strength, version);
         SecureRandom random;
         try
         {
@@ -82,7 +100,11 @@ public class RainbowTest
 
     public static void main(String[] args)
     {
-        runTest(new RainbowTest(3));
-        runTest(new RainbowTest(5));
+        //runTest(new RainbowTest(3, Version.CLASSIC));
+        runTest(new RainbowTest(3, Version.CIRCUMZENITHAL));
+        //runTest(new RainbowTest(3, Version.COMPRESSED));
+        //runTest(new RainbowTest(5, Version.CLASSIC));
+        runTest(new RainbowTest(5, Version.CIRCUMZENITHAL));
+        //runTest(new RainbowTest(5, Version.COMPRESSED));
     }
 }
