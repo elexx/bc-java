@@ -1,5 +1,6 @@
 package org.bouncycastle.pqc.crypto.rainbow.util;
 
+import org.bouncycastle.pqc.crypto.rainbow.RainbowCyclicPublicKeyParameters;
 import org.bouncycastle.pqc.crypto.rainbow.RainbowParameters;
 import org.bouncycastle.pqc.crypto.rainbow.RainbowPublicKeyParameters;
 import org.bouncycastle.util.Arrays;
@@ -74,7 +75,7 @@ public class RainbowPublicMap
         return ret;
     }
 
-    public short[] publicMap(RainbowPublicKeyParameters pk, short[] signature)
+    public short[] publicMap_cyclic(RainbowCyclicPublicKeyParameters pk, short[] signature)
     {
         int v1 = params.getV1();
         int o1 = params.getO1();

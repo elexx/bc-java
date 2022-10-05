@@ -48,7 +48,7 @@ public class RainbowSigner
         }
         else
         {
-            this.key = (RainbowPublicKeyParameters)param;
+            this.key = (RainbowCyclicPublicKeyParameters)param;
         }
 
         this.signableDocumentLength = this.key.getDocLength();
@@ -236,7 +236,7 @@ public class RainbowSigner
         int m  = this.key.getParams().getM(); // o1 + o2
         int n  = this.key.getParams().getN(); // o1 + o2 + v1
 
-        RainbowPublicKeyParameters pk = (RainbowPublicKeyParameters)this.key;
+        RainbowCyclicPublicKeyParameters pk = (RainbowCyclicPublicKeyParameters)this.key;
         RainbowPublicMap p_map = new RainbowPublicMap(this.key.getParams(), this.random);
 
         // h = (short)H(msg_digest||salt)
@@ -248,7 +248,7 @@ public class RainbowSigner
         // verificationResult = P(sig)
         byte[] sig_msg = Arrays.copyOfRange(signature, 0, n);
         short[] sig = RainbowUtil.convertArray(sig_msg);
-        short[] verificationResult = p_map.publicMap(pk, sig);
+        short[] verificationResult = p_map.publicMap_cyclic(pk, sig);
 
         // compare
         return RainbowUtil.equals(h, verificationResult);
