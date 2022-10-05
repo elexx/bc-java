@@ -75,6 +75,12 @@ public class RainbowPublicMap
         return ret;
     }
 
+    public short[] publicMap(RainbowPublicKeyParameters pk, short[] signature)
+    {
+        short[][] accu = compute_accumulator(signature, signature, pk.getPk(), params.getM());
+        return add_and_reduce(accu);
+    }
+
     public short[] publicMap_cyclic(RainbowCyclicPublicKeyParameters pk, short[] signature)
     {
         int v1 = params.getV1();

@@ -287,13 +287,13 @@ public class RainbowKeyComputation
         generate_S_and_T(sk_random);
 
         // generating l1_F1, l1_F2, l2_F1, l2_F2, l2_F3, l2_F5, l2_F6
-        this.l1_F1 = org.bouncycastle.pqc.rainbow.util.RainbowUtil.generate_random(sk_random, o1, v1, v1, true);
-        this.l1_F2 = org.bouncycastle.pqc.rainbow.util.RainbowUtil.generate_random(sk_random, o1, v1, o1, false);
-        this.l2_F1 = org.bouncycastle.pqc.rainbow.util.RainbowUtil.generate_random(sk_random, o2, v1, v1, true);
-        this.l2_F2 = org.bouncycastle.pqc.rainbow.util.RainbowUtil.generate_random(sk_random, o2, v1, o1, false);
-        this.l2_F3 = org.bouncycastle.pqc.rainbow.util.RainbowUtil.generate_random(sk_random, o2, v1, o2, false);
-        this.l2_F5 = org.bouncycastle.pqc.rainbow.util.RainbowUtil.generate_random(sk_random, o2, o1, o1, true);
-        this.l2_F6 = org.bouncycastle.pqc.rainbow.util.RainbowUtil.generate_random(sk_random, o2, o1, o2, false);
+        this.l1_F1 = RainbowUtil.generate_random(sk_random, o1, v1, v1, true);
+        this.l1_F2 = RainbowUtil.generate_random(sk_random, o1, v1, o1, false);
+        this.l2_F1 = RainbowUtil.generate_random(sk_random, o2, v1, v1, true);
+        this.l2_F2 = RainbowUtil.generate_random(sk_random, o2, v1, o1, false);
+        this.l2_F3 = RainbowUtil.generate_random(sk_random, o2, v1, o2, false);
+        this.l2_F5 = RainbowUtil.generate_random(sk_random, o2, o1, o1, true);
+        this.l2_F6 = RainbowUtil.generate_random(sk_random, o2, o1, o2, false);
 
         // calculate the public key
         calculate_Q_from_F();

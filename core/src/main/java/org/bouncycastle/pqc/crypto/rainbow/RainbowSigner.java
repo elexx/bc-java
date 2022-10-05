@@ -5,10 +5,7 @@ import org.bouncycastle.crypto.CryptoServicesRegistrar;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.params.ParametersWithRandom;
 import org.bouncycastle.pqc.crypto.MessageSigner;
-import org.bouncycastle.pqc.crypto.rainbow.util.GF2Field;
-import org.bouncycastle.pqc.crypto.rainbow.util.ComputeInField;
-import org.bouncycastle.pqc.crypto.rainbow.util.RainbowPublicMap;
-import org.bouncycastle.pqc.crypto.rainbow.util.RainbowUtil;
+import org.bouncycastle.pqc.crypto.rainbow.util.*;
 import org.bouncycastle.util.Arrays;
 
 import java.security.SecureRandom;
@@ -26,11 +23,13 @@ public class RainbowSigner
 
     private ComputeInField cf = new ComputeInField();
 
-    RainbowKeyParameters key;
-    Digest hashAlgo;
+    private RainbowKeyParameters key;
+    private Digest hashAlgo;
+    private Version version;
 
     public void init(boolean forSigning, CipherParameters param)
     {
+        RainbowKeyParameters tmp;
         if (forSigning)
         {
             if (param instanceof ParametersWithRandom)
@@ -38,24 +37,53 @@ public class RainbowSigner
                 ParametersWithRandom rParam = (ParametersWithRandom)param;
 
                 this.random = rParam.getRandom();
-                this.key = (RainbowPrivateKeyParameters)rParam.getParameters();
+                tmp = (RainbowKeyParameters)rParam.getParameters();
             }
             else
             {
                 this.random = CryptoServicesRegistrar.getSecureRandom();
-                this.key = (RainbowPrivateKeyParameters)param;
+                tmp = (RainbowKeyParameters)param;
+            }
+            this.version = tmp.getParams().getVersion();
+            switch (this.version)
+            {
+                case CLASSIC:
+                case CIRCUMZENITHAL:
+                    this.key = (RainbowPrivateKeyParameters)tmp;
+                    break;
+                case COMPRESSED:
+                    this.key = (RainbowCompressedPrivateKeyParameters)tmp;
+                    break;
+                default:
+                    throw new IllegalArgumentException(
+                            "No valid version. Please choose one of the following: classic, circumzenithal, compressed");
             }
         }
         else
         {
-            this.key = (RainbowCyclicPublicKeyParameters)param;
+            tmp = (RainbowKeyParameters)param;
+            this.version = tmp.getParams().getVersion();
+            switch (this.version)
+            {
+                case CLASSIC:
+                    this.key = (RainbowPublicKeyParameters)tmp;
+                    break;
+                case CIRCUMZENITHAL:
+                case COMPRESSED:
+                    this.key = (RainbowCyclicPublicKeyParameters)tmp;
+                    break;
+                default:
+                    throw new IllegalArgumentException(
+                            "No valid version. Please choose one of the following: classic, circumzenithal, compressed");
+            }
         }
 
         this.signableDocumentLength = this.key.getDocLength();
         this.hashAlgo = this.key.getParams().getHash_algo();
+
     }
 
-    public byte[] generateSignature(byte[] message)
+    private byte[] genSignature(byte[] message)
     {
         int v1 = this.key.getParams().getV1();
         int o1 = this.key.getParams().getO1();
@@ -231,12 +259,23 @@ public class RainbowSigner
         return Arrays.concatenate(signature, salt);
     }
 
+    public byte[] generateSignature(byte[] message)
+    {
+        if (this.version == Version.COMPRESSED)
+        {
+            RainbowCompressedPrivateKeyParameters compressed_sk = (RainbowCompressedPrivateKeyParameters)this.key;
+
+            RainbowKeyComputation rkc = new RainbowKeyComputation(this.key.getParams(),this.random);
+            this.key = rkc.generatePrivateKey(compressed_sk);
+        }
+        return genSignature(message);
+    }
+
     public boolean verifySignature(byte[] message, byte[] signature)
     {
         int m  = this.key.getParams().getM(); // o1 + o2
         int n  = this.key.getParams().getN(); // o1 + o2 + v1
 
-        RainbowCyclicPublicKeyParameters pk = (RainbowCyclicPublicKeyParameters)this.key;
         RainbowPublicMap p_map = new RainbowPublicMap(this.key.getParams(), this.random);
 
         // h = (short)H(msg_digest||salt)
@@ -248,7 +287,23 @@ public class RainbowSigner
         // verificationResult = P(sig)
         byte[] sig_msg = Arrays.copyOfRange(signature, 0, n);
         short[] sig = RainbowUtil.convertArray(sig_msg);
-        short[] verificationResult = p_map.publicMap_cyclic(pk, sig);
+        short[] verificationResult;
+
+        switch (this.version)
+        {
+            case CLASSIC:
+                RainbowPublicKeyParameters pk = (RainbowPublicKeyParameters)this.key;
+                verificationResult = p_map.publicMap(pk, sig);
+                break;
+            case CIRCUMZENITHAL:
+            case COMPRESSED:
+                RainbowCyclicPublicKeyParameters cpk = (RainbowCyclicPublicKeyParameters)this.key;
+                verificationResult = p_map.publicMap_cyclic(cpk, sig);
+                break;
+            default:
+                throw new IllegalArgumentException(
+                        "No valid version. Please choose one of the following: classic, circumzenithal, compressed");
+        }
 
         // compare
         return RainbowUtil.equals(h, verificationResult);

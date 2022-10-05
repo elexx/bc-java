@@ -100,11 +100,11 @@ public class RainbowTest
 
     public static void main(String[] args)
     {
-        //runTest(new RainbowTest(3, Version.CLASSIC));
+        runTest(new RainbowTest(3, Version.CLASSIC));
         runTest(new RainbowTest(3, Version.CIRCUMZENITHAL));
-        //runTest(new RainbowTest(3, Version.COMPRESSED));
-        //runTest(new RainbowTest(5, Version.CLASSIC));
+        runTest(new RainbowTest(3, Version.COMPRESSED));
+        runTest(new RainbowTest(5, Version.CLASSIC));
         runTest(new RainbowTest(5, Version.CIRCUMZENITHAL));
-        //runTest(new RainbowTest(5, Version.COMPRESSED));
+        runTest(new RainbowTest(5, Version.COMPRESSED));
     }
 }
