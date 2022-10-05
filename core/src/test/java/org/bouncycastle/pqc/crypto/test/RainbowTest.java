@@ -11,18 +11,38 @@ import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
-public class RainbowVTest
+public class RainbowTest
     extends SimpleTest
 {
+    private int strength;
+
+    public RainbowTest(int strength)
+    {
+        this.strength = strength;
+    }
+
     public String getName()
     {
-        return "Rainbow_V";
+        String name;
+        switch (this.strength)
+        {
+            case 3:
+                name = "Rainbow_III";
+                break;
+            case 5:
+                name = "Rainbow_V";
+                break;
+            default:
+                throw new IllegalArgumentException(
+                        "No valid strength. Please choose one of the following: 3, 5");
+        }
+
+        return name;
     }
 
     public void performTest()
     {
-        RainbowParameters params = new RainbowParameters(5);
-
+        RainbowParameters params = new RainbowParameters(strength);
         SecureRandom random;
         try
         {
@@ -32,6 +52,7 @@ public class RainbowVTest
         {
             random = new SecureRandom();
         }
+
 
         RainbowKeyPairGenerator rainbowKeyGen = new RainbowKeyPairGenerator();
         RainbowKeyGenerationParameters genParam = new RainbowKeyGenerationParameters(random, params);
@@ -61,6 +82,7 @@ public class RainbowVTest
 
     public static void main(String[] args)
     {
-        runTest(new RainbowVTest());
+        runTest(new RainbowTest(3));
+        runTest(new RainbowTest(5));
     }
 }
